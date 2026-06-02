@@ -1151,137 +1151,241 @@ function generarPDFCotizacion() {
     const nombreEmpresa = localStorage.getItem("nexi_brand_name") || "NEXI Balloons";
     const moneda = localStorage.getItem("cfg-moneda") || "$";
     
-    const precioFinalElemento = document.getElementById("res-precio-final");
-    const precioFinal = precioFinalElemento ? precioFinalElemento.textContent : `${moneda}0.00`;
+    // Extracción de datos reales de tu cotizador comercial para el desglose premium
+    const insumosTecnicos = document.querySelector(".resumen-desglose-lineal .desglose-item:nth-child(1) span:last-child")?.textContent || `${moneda}0.00`;
+    const operacionManoObra = document.querySelector(".resumen-desglose-lineal .desglose-item:nth-child(2) span:last-child")?.textContent || `${moneda}0.00`;
+    const utilidadNeta = document.querySelector(".resumen-desglose-lineal .desglose-item:nth-child(3) span:last-child")?.textContent || `${moneda}0.00`;
+    const precioFinal = document.getElementById("res-precio-final")?.textContent || `${moneda}0.00`;
     const fechaActual = new Date().toLocaleDateString();
 
-    // 1. Mostrar un aviso de carga en la app principal
+    // 1. Alerta de carga minimalista y elegante (Cambiado a diseño plano sin desajustes)
     Swal.fire({
-        title: 'Generando PDF',
-        text: 'Procesando tu cotización oficial...',
+        title: 'Generando Documento',
+        text: 'Estructurando cotización premium...',
         allowOutsideClick: false,
-        didOpen: () => {
+        showConfirmButton: false,
+        willOpen: () => {
             Swal.showLoading();
         }
     });
 
-    // 2. Abrir una nueva ventana en blanco en el navegador
+    // 2. Apertura del canal de renderizado
     const ventanaPDF = window.open("", "_blank");
     if (!ventanaPDF) {
         Swal.fire({
-            icon: 'error',
-            title: 'Bloqueador de ventanas activado',
-            text: 'Por favor, permite las ventanas emergentes en tu navegador para poder descargar el PDF.'
+            icon: 'warning',
+            title: 'Ventana emergente bloqueada',
+            text: 'Por favor, permite las ventanas emergentes en tu navegador para descargar el documento.',
+            confirmButtonColor: '#111827'
         });
         return;
     }
 
-    // 3. Escribir un HTML completamente aislado e independiente dentro de esa ventana
+    // 3. Escritura del diseño Premium y Elegante
     ventanaPDF.document.write(`
         <!DOCTYPE html>
         <html lang="es">
         <head>
             <meta charset="UTF-8">
-            <title>Cotización - ${nombreEmpresa}</title>
+            <title>Cotización Ejecutiva — ${nombreEmpresa}</title>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
             <style>
-                /* Estilos puros e independientes de tu CSS principal */
+                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+                
                 body {
                     margin: 0;
                     padding: 0;
                     background-color: #ffffff;
-                    font-family: Arial, sans-serif;
-                    color: #111827;
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    color: #1f2937;
+                    -webkit-print-color-adjust: exact;
                 }
-                .invoice-box {
-                    max-width: 800px;
+                .page-wrapper {
+                    max-width: 840px;
                     margin: auto;
-                    padding: 40px;
+                    padding: 50px;
                     box-sizing: border-box;
-                    background: #ffffff;
                 }
-                .header-table {
+                .meta-table {
                     width: 100%;
                     border-collapse: collapse;
-                    border-bottom: 2px solid #e5e7eb;
-                    padding-bottom: 20px;
-                    margin-bottom: 30px;
-                }
-                .description-box {
-                    background-color: #f9fafb;
-                    border-left: 4px solid #6366f1;
-                    padding: 20px;
-                    border-radius: 8px;
-                    margin-bottom: 35px;
-                    text-align: left;
-                }
-                .price-box {
-                    border: 1px solid #e5e7eb;
-                    border-radius: 12px;
-                    padding: 35px;
-                    text-align: center;
-                    background-color: #f3f4f6;
                     margin-bottom: 40px;
                 }
-                .footer-box {
-                    margin-top: 100px;
-                    text-align: center;
-                    border-top: 1px solid #e5e7eb;
-                    padding-top: 20px;
+                .brand-title {
+                    font-family: 'Playfair Display', serif;
+                    font-size: 36px;
+                    font-weight: 600;
+                    color: #111827;
+                    margin: 0;
+                    letter-spacing: -0.5px;
+                }
+                .brand-subtitle {
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 1.5px;
+                    color: #6b7280;
+                    margin: 6px 0 0 0;
+                    font-weight: 600;
+                }
+                .doc-type {
+                    text-align: right;
                     font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
                     color: #9ca3af;
+                    font-weight: 700;
+                }
+                .doc-date {
+                    text-align: right;
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: #111827;
+                    margin-top: 4px;
+                }
+                .divider {
+                    height: 1px;
+                    background: linear-gradient(to right, #111827, #e5e7eb);
+                    margin-bottom: 35px;
+                }
+                .intro-text {
+                    font-size: 14px;
+                    line-height: 1.7;
+                    color: #4b5563;
+                    margin-bottom: 40px;
+                    font-style: italic;
+                }
+                .breakdown-title {
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: #111827;
+                    font-weight: 700;
+                    margin-bottom: 15px;
+                    border-bottom: 1px solid #f3f4f6;
+                    padding-bottom: 8px;
+                }
+                .financial-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 45px;
+                }
+                .financial-table td {
+                    padding: 12px 0;
+                    font-size: 14px;
+                    color: #4b5563;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+                .financial-table .amount {
+                    text-align: right;
+                    font-weight: 600;
+                    color: #111827;
+                }
+                .investment-card {
+                    background: #111827;
+                    border-radius: 16px;
+                    padding: 30px;
+                    text-align: center;
+                    color: #ffffff;
+                    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+                }
+                .investment-label {
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 2.5px;
+                    color: #9ca3af;
+                    font-weight: 600;
+                    display: block;
+                    margin-bottom: 8px;
+                }
+                .investment-amount {
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 44px;
+                    font-weight: 800;
+                    color: #ffffff;
+                    margin: 0;
+                    letter-spacing: -1px;
+                }
+                .investment-note {
+                    font-size: 11px;
+                    color: #6b7280;
+                    margin-top: 15px;
+                }
+                .footer-notice {
+                    margin-top: 120px;
+                    text-align: center;
+                    font-size: 11px;
+                    letter-spacing: 0.5px;
+                    color: #9ca3af;
+                    border-top: 1px solid #f3f4f6;
+                    padding-top: 25px;
                 }
             </style>
-        </head>
+ head>
         <body>
-            <div class="invoice-box" id="contenedor-imprimir">
-                <table class="header-table">
+            <div class="page-wrapper" id="canvas-pdf">
+                <table class="meta-table">
                     <tr>
-                        <td style="vertical-align: top; text-align: left;">
-                            <h1 style="font-size: 28px; margin: 0; font-weight: bold; color: #6366f1;">${nombreEmpresa}</h1>
-                            <p style="font-size: 13px; color: #6b7280; margin: 5px 0 0 0;">Documento Oficial de Cotización</p>
+                        <td>
+                            <h1 class="brand-title">${nombreEmpresa}</h1>
+                            <p class="brand-subtitle">Arte & Diseño Conceptual</p>
                         </td>
-                        <td style="text-align: right; vertical-align: top;">
-                            <p style="font-size: 11px; color: #6b7280; margin: 0; text-transform: uppercase;">Fecha de Emisión</p>
-                            <p style="font-size: 14px; font-weight: bold; margin: 4px 0 0 0; color: #111827;">${fechaActual}</p>
+                        <td style="vertical-align: top;">
+                            <div class="doc-type">Presupuesto Formal</div>
+                            <div class="doc-date">${fechaActual}</div>
                         </td>
                     </tr>
                 </table>
 
-                <div class="description-box">
-                    <h3 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; color: #4b5563; font-weight: bold;">Descripción del Proyecto</h3>
-                    <p style="margin: 0; font-size: 13px; color: #4b5563; line-height: 1.5;">
-                        Agradecemos la oportunidad de cotizar con ustedes. A continuación, se presenta el presupuesto formal estimado para el desarrollo y ejecución del proyecto de decoración y diseño solicitado. Este presupuesto contempla materiales de alta calidad y mano de obra especializada.
-                    </p>
+                <div class="divider"></div>
+
+                <div class="intro-text">
+                    Estimado cliente,<br><br>
+                    Es un placer presentarle nuestra propuesta económica y técnica formalizada para el desarrollo arquitectónico de su próximo evento. Cada uno de los valores descritos a continuación ha sido meticulosamente calculado para garantizar los más altos estándares de calidad decorativa, excelencia logística y materiales de categoría premium.
                 </div>
 
-                <div class="price-box">
-                    <span style="font-size: 12px; font-weight: bold; color: #6b7280; text-transform: uppercase; display: block; margin-bottom: 5px;">Inversión Total Estimada</span>
-                    <div style="font-size: 42px; font-weight: bold; color: #111827; margin: 10px 0;">
-                        ${precioFinal}
-                    </div>
-                    <p style="font-size: 11px; color: #9ca3af; margin: 0;">* Los precios expresados están sujetos a cambios según modificaciones de diseño.</p>
-                </div>
+                <div class="breakdown-title">Desglose Consolidado</div>
+                <table class="financial-table">
+                    <tr>
+                        <td>Insumos Estructurales y Materiales Técnicos</td>
+                        <td class="amount">${insumosTecnicos}</td>
+                    </tr>
+                    <tr>
+                        <td>Logística Operativa (Mano de Obra Especializada y Desplazamiento)</td>
+                        <td class="amount">${operacionManoObra}</td>
+                    </tr>
+                    <tr>
+                        <td>Cargos Administrativos y Cobertura de Utilidad</td>
+                        <td class="amount">${utilidadNeta}</td>
+                    </tr>
+                </table>
 
-                <div class="footer-box">
-                    Gracias por tu confianza en ${nombreEmpresa}. Generado de forma segura por NEXI App.
+                <div class="investment-card">
+                    <span class="investment-label">Inversión Total Propuesta</span>
+                    <h2 class="investment-amount">${precioFinal}</h2>
+                </div>
+                
+                <p class="investment-note" style="text-align: center;">
+                    * Los montos presentados corresponden a la configuración actual del proyecto y tienen una validez de 15 días naturales a partir de la fecha de emisión.
+                </p>
+
+                <div class="footer-notice">
+                    Agradecemos la distinción de su preferencia con ${nombreEmpresa}.<br>
+                    Documento digital emitido de forma confidencial. All rights reserved.
                 </div>
             </div>
 
             <script>
-                // Ejecutamos la descarga una vez que todo el DOM de esta ventana se haya estructurado
                 window.onload = function() {
-                    const elemento = document.getElementById("contenedor-imprimir");
-                    const opciones = {
-                        margin:       10,
+                    const el = document.getElementById("canvas-pdf");
+                    const ops = {
+                        margin:       0,
                         filename:     "Cotizacion_${nombreEmpresa.replace(/\s+/g, '_')}.pdf",
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true, logging: false },
+                        html2canvas:  { scale: 2.5, useCORS: true, logging: false, letterRendering: true },
                         jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
                     };
                     
-                    // Renderizar, guardar y cerrar automáticamente la pestaña al terminar
-                    html2pdf().set(opciones).from(elemento).save().then(() => {
+                    html2pdf().set(ops).from(el).save().then(() => {
                         window.close();
                     }).catch(err => {
                         console.error(err);
@@ -1295,15 +1399,10 @@ function generarPDFCotizacion() {
     
     ventanaPDF.document.close();
 
-    // 4. Cerrar el modal de carga en la ventana principal tras iniciar la exportación externa
+    // 4. Modificación de la confirmación: Se eliminó el SweetAlert final que rompía el flujo en móviles
     setTimeout(() => {
-        Swal.fire({
-            icon: 'success',
-            title: '¡Procesado!',
-            text: 'Tu documento se ha enviado a la cola de descargas.',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }, 1000);
+        Swal.close();
+    }, 1200);
 }
+
 
