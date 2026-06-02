@@ -1058,6 +1058,7 @@ function filtrarInventarioEnTiempoReal() {
 /**
  * Limpia por completo los materiales agregados al módulo o composición activa
  */
+ 
 function limpiarModuloActual() {
     Swal.fire({
         title: '¿Vaciar sección?',
@@ -1080,16 +1081,17 @@ function limpiarModuloActual() {
             const inputCantidad = document.getElementById("input-cantidad-modulo");
             if (inputCantidad) inputCantidad.value = "";
 
+            // 💡 SOLUCIÓN AQUÍ: Usamos un check estilizado en HTML puro para saltarnos el icono roto
             Swal.fire({
-                title: '¡Vaciado!',
-                text: 'La sección se ha reiniciado correctamente.',
-                icon: 'success',
+                title: '<div style="color: #10b981; font-size: 45px; margin-bottom: 10px;">✔</div>¡Vaciado!',
+                html: '<p style="font-size:15px; color:#4b5563;">La sección se ha reiniciado correctamente.</p>',
                 timer: 1200,
                 showConfirmButton: false
             });
         }
     });
 }
+
 
 async function verificarYMigrarAPremium(url, email, token) {
     try {
@@ -1154,17 +1156,21 @@ function generarPDFCotizacion() {
     const precioFinalElemento = document.getElementById("res-precio-final");
     const precioFinal = precioFinalElemento ? precioFinalElemento.textContent : `${moneda}0.00`;
 
-    // 2. Crear el contenedor temporal
+    // 2. Crear el contenedor temporal optimizado para navegadores móviles
     const elementoPDF = document.createElement("div");
     
-    // Añadimos estilos para que no arruine tu interfaz real mientras se genera
-    elementoPDF.style.position = "absolute";
-    elementoPDF.style.left = "-9999px";
+    // 💡 TRUCO ANTI-BLANCO: Lo fijamos en pantalla con opacidad 0. 
+    // Sigue existiendo para el motor gráfico, pero el ojo humano no lo ve.
+    elementoPDF.style.position = "fixed";
+    elementoPDF.style.left = "0";
     elementoPDF.style.top = "0";
-    elementoPDF.style.width = "700px"; // Ancho ideal para formato carta
+    elementoPDF.style.width = "750px"; // Ancho exacto para emular formato carta en renderizado
+    elementoPDF.style.opacity = "0";
+    elementoPDF.style.zIndex = "-9999";
+    elementoPDF.style.pointerEvents = "none";
 
     elementoPDF.innerHTML = `
-        <div style="padding: 40px; font-family: Arial, sans-serif; color: #111827; background: #ffffff;">
+        <div style="padding: 45px; font-family: Arial, sans-serif; color: #111827; background: #ffffff;">
             
             <table style="width: 100%; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
                 <tr>
@@ -1182,11 +1188,11 @@ function generarPDFCotizacion() {
             <div style="background: #f9fafb; border-left: 4px solid #6366f1; padding: 20px; border-radius: 8px; margin-bottom: 40px;">
                 <h3 style="margin: 0 0 8px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563;">Descripción del Proyecto</h3>
                 <p style="margin: 0; font-size: 14px; color: #4b5563; line-height: 1.6;">
-                    Agradecemos la oportunidad de cotizar con ustedes. A continuación, se presenta el desglose y el presupuesto formal estimado para el desarrollo y ejecución del proyecto de decoración y diseño solicitado. Este presupuesto contempla materiales premium y mano de obra calificada.
+                    Agradecemos la oportunidad de cotizar con ustedes. A continuación, se presenta el presupuesto formal estimado para el desarrollo y ejecución del proyecto de decoración y diseño solicitado. Este presupuesto contempla materiales premium y mano de obra calificada.
                 </p>
             </div>
 
-            <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; text-align: center; background: #f3f4f6;">
+            <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; text-align: center; background: #f3f4f6; margin-bottom: 40px;">
                 <span style="font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px;">Inversión Total del Proyecto</span>
                 <div style="font-size: 42px; font-weight: 800; color: #111827; margin: 10px 0;">
                     ${precioFinal}
@@ -1194,57 +1200,63 @@ function generarPDFCotizacion() {
                 <p style="font-size: 12px; color: #9ca3af; margin: 0;">* Los precios expresados están sujetos a cambios según modificaciones de diseño.</p>
             </div>
 
-            <div style="margin-top: 150px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            <div style="margin-top: 100px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px;">
                 <p style="font-size: 11px; color: #9ca3af; margin: 0;">Gracias por tu confianza en ${nombreEmpresa}. Generado de forma segura por NEXI App.</p>
             </div>
         </div>
     `;
 
-    // 💡 LA CLAVE: Insertar el elemento al documento real para que html2pdf pueda leerlo
+    // Insertar el clon en el cuerpo del documento
     document.body.appendChild(elementoPDF);
 
-    // 3. Configuración avanzada de conversión para html2pdf
+    // 3. Configuración móvil optimizada
     const opciones = {
-        margin:       10, // Margen físico de la hoja para evitar recortes
+        margin:       10,
         filename:     `Cotizacion_${nombreEmpresa.replace(/\s+/g, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, logging: false, useCORS: true },
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { 
+            scale: 2, 
+            logging: false, 
+            useCORS: true,
+            width: 750 // Forzar el ancho de captura
+        },
         jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
     };
 
-    // Alerta visual de procesamiento
+    // Lanzar cargando de SweetAlert2
     Swal.fire({
         title: 'Generando PDF',
-        text: 'Preparando tu documento de cotización...',
+        text: 'Construyendo cotización para descarga...',
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
         }
     });
 
-    // 4. Disparar renderizado y descarga
-    html2pdf().set(opciones).from(elementoPDF).save().then(() => {
-        // 💡 LIMPIEZA: Una vez guardado el PDF, removemos el clon invisible de la pantalla
-        document.body.removeChild(elementoPDF);
-
-        Swal.fire({
-            icon: 'success',
-            title: '¡Descarga Exitosa!',
-            text: 'Tu PDF se ha guardado en el dispositivo.',
-            timer: 2000,
-            showConfirmButton: false
+    // 💡 TRUCO DE TIEMPO: Esperamos 300ms para asegurar que el DOM del teléfono dibuje el div invisible
+    setTimeout(() => {
+        html2pdf().set(opciones).from(elementoPDF).save().then(() => {
+            // Limpieza exitosa
+            if (document.body.contains(elementoPDF)) {
+                document.body.removeChild(elementoPDF);
+            }
+            Swal.fire({
+                icon: 'success',
+                title: '¡Descarga Exitosa!',
+                text: 'Tu PDF se ha guardado en el dispositivo.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }).catch(error => {
+            console.error("Error al exportar PDF:", error);
+            if (document.body.contains(elementoPDF)) {
+                document.body.removeChild(elementoPDF);
+            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Renderizado',
+                text: 'No se pudo compilar el documento en este navegador.'
+            });
         });
-    }).catch(error => {
-        console.error("Error al exportar PDF:", error);
-        // Intentar limpiar también en caso de error
-        if (document.body.contains(elementoPDF)) {
-            document.body.removeChild(elementoPDF);
-        }
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo exportar el PDF. Inténtalo de nuevo.'
-        });
-    });
+    }, 300);
 }
-
