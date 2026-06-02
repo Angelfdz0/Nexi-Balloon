@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXI Balloons | Costos y Cotizaciones para Decoración Profesional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Librería para generar PDFs desde HTML -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="cloud-status-container">
+            <div id="cloud-banner" class="cloud-status-banner">NEXICloud: Modo Local (Sin sincronizar)</div>
+        </div>
+
+        <header class="main-header">
+            <div class="logo-area">
+                <h1>NEXI Balloons</h1>
+                <p class="subtitle">Gestión de Costos y Diseños para Eventos</p>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-primary btn-config-nube" onclick="abrirModalConfig()">
+                    <span class="material-symbols-outlined">cloud</span> Configurar Nube
+                </button>
+            </div>
+
+            <div class="balloon-sky-container">
+                <div class="mini-balloon b1"></div>
+                <div class="mini-balloon b2"></div>
+                <div class="mini-balloon b3"></div>
+                <div class="mini-balloon b4"></div>
+            </div>
+        </header>
+
+        <div class="app-grid">
+            <div class="left-column">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon-title">
+                            <span class="material-symbols-outlined header-card-icon">inventory_2</span>
+                            <h2 class="card-title">Inventario de Materiales</h2>
+                        </div>
+                        <span class="material-symbols-outlined btn-ayuda-tooltip" onclick="abrirAyuda('seccion-inventario')" style="cursor: pointer; color: var(--text-muted); font-size: 20px; display: inline-block;">help</span>
+                    </div>
+                    
+                    <form id="form-insumo" onsubmit="guardarInsumoEvent(event)">
+                        <div class="form-grid">
+                            <div class="form-group span-2">
+                                <label for="insumo-nombre">Nombre del Material / Insumo:</label>
+                                <input type="text" id="insumo-nombre" placeholder="Ej: Globo Látex R12 Reflex" required>
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="insumo-marca">Marca / Calidad (Opcional):</label>
+                                <input type="text" id="insumo-marca" placeholder="Ej: Sempertex, Qualatex, Genérico">
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-unidad">Tipo / Unidad de Compra:</label>
+                                <select id="insumo-unidad" onchange="actualizarLabelContenido()">
+                                    <option value="paquete">Paquete (Pzas)</option>
+                                    <option value="pieza">Pieza Unitaria (Consumible)</option>
+                                    <option value="tanque">Tanque / Cilindro (Helio)</option>
+                                    <option value="metro">Metro (m)</option>
+                                    <option value="estructura">Estructura Propia (Calcular Renta/Depreciación)</option>
+                                    <option value="estructura_rentada">Estructura Rentada a Terceros (Costo Directo)</option>
+                                    <option value="global">Global (Gbl)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-contenido" id="label-contenido">Contenido (Pzas por Paquete):</label>
+                                <input type="number" id="insumo-contenido" value="50" min="0.001" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-costo" id="label-costo">Costo Total Compra + Envío ($):</label>
+                                <input type="number" id="insumo-costo" placeholder="0.00" min="0" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="btn btn-primary full-width">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add_circle</span> Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="table-container" style="max-height: 250px; overflow-y: auto; margin-top: 15px;">
+                        <div class="buscador-container" style="margin-bottom: 12px; display: flex; gap: 8px; align-items: center;">
+    <span class="material-symbols-outlined" style="color: #6b7280; font-size: 20px;">search</span>
+    <input type="text" id="buscador-inventario" placeholder="Buscar material por nombre o marca..." 
+           style="flex-grow: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none;"
+           oninput="filtrarInventarioEnTiempoReal()">
+</div>
+
+<div class="contenedor-tabla-inventario">
+    <table id="tabla-insumos" class="tabla-moderna">
+        <thead>
+            <tr>
+                <th>Material / Insumo</th>
+                <th>Formato Compra</th>
+                <th>Costo U.</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+</div>
+                </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon-title">
+                            <span class="material-symbols-outlined header-card-icon">architecture</span>
+                            <h2 class="card-title">Composición y Módulos del Arreglo</h2>
+                        </div>
+                        <span class="material-symbols-outlined btn-ayuda-tooltip" onclick="abrirAyuda('seccion-composicion')" style="cursor: pointer; color: var(--text-muted); font-size: 20px; display: inline-block;">help</span>
+                    </div>
+
+                    <div class="tabs-modulos">
+                        <button class="tab-btn active" id="tab-pan" onclick="cambiarModulo('pan')">🎈 Globos y Calibres</button>
+                        <button class="tab-btn" id="tab-relleno" onclick="cambiarModulo('relleno')">🏗️ Estructuras y Helio</button>
+                        <button class="tab-btn" id="tab-betun" onclick="cambiarModulo('betun')">✨ Accesorios y Detalles</button>
+                    </div>
+
+                    <div class="modulo-selector-box">
+                        <div class="form-grid">
+                            <div class="form-group span-2">
+                                <label for="select-insumo-modulo">Selecciona Material del Inventario:</label>
+                                <select id="select-insumo-modulo">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-cantidad-modulo" id="label-cantidad-modulo">Cantidad Requerida (Pzas):</label>
+                                <input type="number" id="input-cantidad-modulo" placeholder="Ej: 25" min="0.001" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-primary full-width" onclick="agregarMaterialAModulo()">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="contenedor-tabla-modulo-padre">
+                        <div class="table-container">
+                            <table id="tabla-modulo-actual">
+                                <thead>
+                                    <tr>
+                                        <th>Insumo Utilizado</th>
+                                        <th>Cantidad</th>
+                                        <th>Costo Proporcional</th>
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                                        <div class="subtotal-modulo">
+                        Subtotal Sección: <span id="subtotal-modulo-valor">$0.00</span>
+                    </div>
+
+                    <div class="contenedor-botones-plantilla" style="display: flex; gap: 8px; margin-top: 20px; justify-content: space-between;">
+                        <button type="button" class="btn" style="flex: 1; min-width: 0; padding: 12px 6px; font-size: 11px; background: #111827; color: white; display: flex; align-items: center; justify-content: center; gap: 4px; border-radius: 8px; font-weight: 600;" onclick="guardarComposicionComoPlantilla()">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">save</span> PLANTILLA
+                        </button>
+                        <button type="button" class="btn" style="flex: 1; min-width: 0; padding: 12px 6px; font-size: 11px; background: #ffffff; color: #111827; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center; gap: 4px; border-radius: 8px; font-weight: 600;" onclick="abrirMenuCargarPlantillas()">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">folder_open</span> CARGAR
+                        </button>
+                        <button type="button" class="btn" style="flex: 1; min-width: 0; padding: 12px 6px; font-size: 11px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; gap: 4px; border-radius: 8px; font-weight: 600; border: none; box-shadow: 0 4px 10px rgba(239,68,68,0.15);" onclick="limpiarModuloActual()">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">delete_sweep</span> LIMPIAR
+                        </button>
+                    </div>
+
+
+
+                </div> <!-- Cierre de la card de Composición -->
+            </div> <!-- Cierre de left-column -->
+
+            <div class="right-column">
+
+                
+                <div class="card premium-card" id="tarjeta-cotizador" style="background: #ffffff; border-radius: 16px; padding: 16px; border: 1px solid #e5e7eb;">
+    <div class="card-header" style="margin-bottom: 16px;">
+        <div class="card-icon-title">
+            <span class="material-symbols-outlined header-card-icon" style="color: #111827; font-size: 22px;">calculate</span>
+            <h2 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #111827;">Cotizador Comercial de Eventos</h2>
+        </div>
+        <span class="material-symbols-outlined btn-ayuda-tooltip" onclick="abrirAyuda('seccion-cotizador')" style="cursor: pointer; color: var(--text-muted); font-size: 20px; display: inline-block;">help</span>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 12px;">
+        <label style="font-size: 13px; font-weight: 600; color: #4b5563;">¿Cómo estás cotizando?</label>
+        <select id="tipo-cotizacion" onchange="alternarCamposCotizador(); calcularPrecioFinalEvento();" 
+                style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 8px;">
+            <option value="proyecto">Proyecto Cerrado (total del material ingresado)</option>
+            <option value="metro">Por Metro (Cobró por Metraje)</option>
+        </select>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div class="grupo-input">
+            <label class="etiqueta-input" style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase;">Metros / Piezas:</label>
+            <input type="number" id="dimension-metros" min="1" value="1" placeholder="Ej: 1" oninput="calcularPrecioFinalEvento()" class="control-input" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb;">
+        </div>
+        <div class="grupo-input">
+            <label class="etiqueta-input" style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase;">Margen Ganancia (%):</label>
+            <select id="cot-margen" onchange="calcularPrecioFinalEvento()" class="control-input" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb; font-family: inherit; font-size: 14px; color: #111827; height: 42px;">
+                <option value="150">150% — Mínimo Comercial</option>
+                <option value="200" selected>200% — Estándar Saludable</option>
+                <option value="250">250% — Estándar Avanzado</option>
+                <option value="300">300% — Premium / Corp.</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div class="grupo-input">
+            <label class="etiqueta-input" style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase;">Horas de Montaje:</label>
+            <input type="number" id="cot-horas" min="0" placeholder="Tiempo Estimado" oninput="calcularPrecioFinalEvento()" class="control-input" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb;">
+        </div>
+        <div class="grupo-input">
+            <label class="etiqueta-input" style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase;">Costo por Hora ($):</label>
+            <input type="number" id="cot-costo-hora" min="0" placeholder="Tu salario x hora" oninput="calcularPrecioFinalEvento()" class="control-input" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb;">
+        </div>
+    </div>
+
+    <div class="grupo-input" style="margin-bottom: 16px;">
+        <label class="etiqueta-input" style="display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase;">Viáticos / Transporte ($):</label>
+        <input type="number" id="cot-viaticos" min="0" placeholder="Gastos de viaje (revisa la guia de cobro en ayuda)" oninput="calcularPrecioFinalEvento()" class="control-input" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb;">
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; box-sizing: border-box; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 12px 0; color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Resumen Financiero</h4>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 6px;">
+            <span>Insumos Técnicos:</span>
+            <span id="res-costo-materiales" style="font-weight: 500; color: #1e293b;">$0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 8px;">
+            <span>Operación (Mano Obra + Viáticos):</span>
+            <span id="res-costo-operacion" style="font-weight: 500; color: #1e293b;">$0.00</span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #059669; font-weight: 600; margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0;">
+            <span>Utilidad Neta Empresa:</span>
+            <span id="res-utilidad">$0.00</span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px;">
+            <span style="font-weight: 700; color: #1e293b; font-size: 14px;">PRECIO SUGERIDO:</span>
+            <span id="res-precio-final" style="font-size: 22px; font-weight: 800; color: #111827;">$0.00</span>
+        </div>
+    </div>
+    
+    <button class="btn btn-success" id="btn-whatsapp-cotizacion" style="width: 100%; padding: 14px; font-size: 15px;" onclick="enviarCotizacionWhatsApp()">
+        <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 18px; margin-right: 4px;">send</span> Enviar Presupuesto Listo a WhatsApp
+    </button>
+    <button class="btn btn-primary full-width" onclick="generarPDFCotizacion()" style="margin-top: 12px; background: #374151 !important;">
+    <span>📥</span> Descargar PDF de Cotización
+</button>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer>Desarrollado por NEXI Systems | Todos los derechos reservados © 2026.</footer>
+
+    <div id="modal-config" class="modal-overlay" style="display: none;">
+        <div class="modal-content animate-pop">
+            <h3 style="margin-top: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined" style="color: var(--btn-main);">cloud_sync</span> Sincronización NEXICloud
+            </h3>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="cfg-pasteleria">Nombre del Negocio:</label>
+                <input type="text" id="cfg-pasteleria" value="NEXI Balloons">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="cfg-moneda">Símbolo de Moneda:</label>
+                <input type="text" id="cfg-moneda" value="$" placeholder="Ej: $">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="cfg-indirectos">Gastos Indirectos por Evento (%):</label>
+                <input type="number" id="cfg-indirectos" value="10" min="0">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="cfg-merma">Margen de Seguridad / Merma de Globos (%):</label>
+                <input type="number" id="cfg-merma" value="5" min="0">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="cfg-correo">Correo de Usuario Vinculado:</label>
+                <input type="email" id="cfg-correo" placeholder="ejemplo@correo.com">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="cfg-token">Token de Seguridad:</label>
+                <input type="password" id="cfg-token" placeholder="Tu token único de acceso">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="cerrarModalConfig()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarConfiguracion()">Guardar y Sincronizar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script>
+        function abrirModalConfig() {
+            document.getElementById('modal-config').style.display = 'flex';
+        }
+        function cerrarModalConfig() {
+            document.getElementById('modal-config').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
