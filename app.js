@@ -1148,68 +1148,67 @@ function cargarDatosSegunModo() {
 }
 
 function generarPDFCotizacion() {
-    // 1. Obtener los datos actuales de la cotización y configuración
     const nombreEmpresa = localStorage.getItem("nexi_brand_name") || "NEXI Balloons";
     const moneda = localStorage.getItem("cfg-moneda") || "$";
     
-    // Capturar el precio final desde el elemento de tu interfaz
     const precioFinalElemento = document.getElementById("res-precio-final");
     const precioFinal = precioFinalElemento ? precioFinalElemento.textContent : `${moneda}0.00`;
 
-    // 2. Crear el contenedor temporal optimizado para navegadores móviles
+    // 1. Contenedor purificado con una clase única para esquivar las reglas globales de tu CSS
     const elementoPDF = document.createElement("div");
+    elementoPDF.className = "nexi-pdf-isolated-container";
     
-    // 💡 TRUCO ANTI-BLANCO: Lo fijamos en pantalla con opacidad 0. 
-    // Sigue existiendo para el motor gráfico, pero el ojo humano no lo ve.
-    elementoPDF.style.position = "fixed";
-    elementoPDF.style.left = "0";
-    elementoPDF.style.top = "0";
-    elementoPDF.style.width = "750px"; // Ancho exacto para emular formato carta en renderizado
-    elementoPDF.style.opacity = "0";
-    elementoPDF.style.zIndex = "-9999";
-    elementoPDF.style.pointerEvents = "none";
+    // Forzamos estilos absolutos por encima de cualquier framework o reset CSS
+    elementoPDF.style.setProperty("position", "fixed", "important");
+    elementoPDF.style.setProperty("left", "0", "important");
+    elementoPDF.style.setProperty("top", "0", "important");
+    elementoPDF.style.setProperty("width", "790px", "important"); 
+    elementoPDF.style.setProperty("background-color", "#ffffff", "important");
+    elementoPDF.style.setProperty("opacity", "0.99", "important"); // Se mantiene visible pero oculto tras el z-index
+    elementoPDF.style.setProperty("z-index", "-99999", "important");
+    elementoPDF.style.setProperty("pointer-events", "none", "important");
 
+    // 2. Maquetación HTML usando únicamente tablas para asegurar compatibilidad móvil
     elementoPDF.innerHTML = `
-        <div style="padding: 45px; font-family: Arial, sans-serif; color: #111827; background: #ffffff;">
+        <div style="padding: 40px; font-family: Arial, sans-serif; color: #111827 !important; background-color: #ffffff !important; width: 100%; box-sizing: border-box;">
             
-            <table style="width: 100%; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
+            <table style="width: 100%; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; border-collapse: collapse;">
                 <tr>
-                    <td>
-                        <h1 style="font-size: 28px; margin: 0; font-weight: 800; color: #6366f1;">${nombreEmpresa}</h1>
-                        <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">Documento Oficial de Cotización</p>
+                    <td style="vertical-align: top; text-align: left;">
+                        <h1 style="font-size: 28px; margin: 0; font-weight: bold; color: #6366f1 !important;">${nombreEmpresa}</h1>
+                        <p style="font-size: 13px; color: #6b7280 !important; margin: 5px 0 0 0;">Documento Oficial de Cotización</p>
                     </td>
-                    <td style="text-align: right; vertical-align: middle;">
-                        <p style="font-size: 12px; color: #6b7280; margin: 0;">Fecha de Emisión</p>
-                        <p style="font-size: 14px; font-weight: 700; margin: 4px 0 0 0;">${new Date().toLocaleDateString()}</p>
+                    <td style="text-align: right; vertical-align: top;">
+                        <p style="font-size: 11px; color: #6b7280 !important; margin: 0; text-transform: uppercase;">Fecha de Emisión</p>
+                        <p style="font-size: 14px; font-weight: bold; margin: 4px 0 0 0; color: #111827 !important;">${new Date().toLocaleDateString()}</p>
                     </td>
                 </tr>
             </table>
 
-            <div style="background: #f9fafb; border-left: 4px solid #6366f1; padding: 20px; border-radius: 8px; margin-bottom: 40px;">
-                <h3 style="margin: 0 0 8px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563;">Descripción del Proyecto</h3>
-                <p style="margin: 0; font-size: 14px; color: #4b5563; line-height: 1.6;">
-                    Agradecemos la oportunidad de cotizar con ustedes. A continuación, se presenta el presupuesto formal estimado para el desarrollo y ejecución del proyecto de decoración y diseño solicitado. Este presupuesto contempla materiales premium y mano de obra calificada.
+            <div style="background-color: #f9fafb !important; border-left: 4px solid #6366f1; padding: 15px; border-radius: 8px; margin-bottom: 35px; text-align: left;">
+                <h3 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; color: #4b5563 !important; font-weight: bold;">Descripción del Proyecto</h3>
+                <p style="margin: 0; font-size: 13px; color: #4b5563 !important; line-height: 1.5;">
+                    Agradecemos la oportunidad de cotizar con ustedes. A continuación, se presenta el presupuesto formal estimado para el desarrollo y ejecución del proyecto de decoración y diseño solicitado. Este presupuesto contempla materiales de alta calidad y mano de obra especializada.
                 </p>
             </div>
 
-            <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; text-align: center; background: #f3f4f6; margin-bottom: 40px;">
-                <span style="font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px;">Inversión Total del Proyecto</span>
-                <div style="font-size: 42px; font-weight: 800; color: #111827; margin: 10px 0;">
+            <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; text-align: center; background-color: #f3f4f6 !important; margin-bottom: 40px;">
+                <span style="font-size: 12px; font-weight: bold; color: #6b7280 !important; text-transform: uppercase; display: block; margin-bottom: 5px;">Inversión Total Estimada</span>
+                <div style="font-size: 42px; font-weight: bold; color: #111827 !important; margin: 10px 0;">
                     ${precioFinal}
                 </div>
-                <p style="font-size: 12px; color: #9ca3af; margin: 0;">* Los precios expresados están sujetos a cambios según modificaciones de diseño.</p>
+                <p style="font-size: 11px; color: #9ca3af !important; margin: 0;">* Los precios expresados están sujetos a cambios según modificaciones de diseño.</p>
             </div>
 
             <div style="margin-top: 100px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-                <p style="font-size: 11px; color: #9ca3af; margin: 0;">Gracias por tu confianza en ${nombreEmpresa}. Generado de forma segura por NEXI App.</p>
+                <p style="font-size: 11px; color: #9ca3af !important; margin: 0;">Gracias por tu confianza en ${nombreEmpresa}. Generado por NEXI App.</p>
             </div>
         </div>
     `;
 
-    // Insertar el clon en el cuerpo del documento
     document.body.appendChild(elementoPDF);
 
-    // 3. Configuración móvil optimizada
+    // 3. Configuración para saltarse las restricciones de compresión móvil
     const opciones = {
         margin:       10,
         filename:     `Cotizacion_${nombreEmpresa.replace(/\s+/g, '_')}.pdf`,
@@ -1218,45 +1217,45 @@ function generarPDFCotizacion() {
             scale: 2, 
             logging: false, 
             useCORS: true,
-            width: 750 // Forzar el ancho de captura
+            width: 790,
+            scrollY: 0,
+            scrollX: 0
         },
         jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
     };
 
-    // Lanzar cargando de SweetAlert2
     Swal.fire({
         title: 'Generando PDF',
-        text: 'Construyendo cotización para descarga...',
+        text: 'Preparando tu documento...',
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
         }
     });
 
-    // 💡 TRUCO DE TIEMPO: Esperamos 300ms para asegurar que el DOM del teléfono dibuje el div invisible
+    // Pequeño retardo para asegurar la asincronía del DOM en Vercel
     setTimeout(() => {
         html2pdf().set(opciones).from(elementoPDF).save().then(() => {
-            // Limpieza exitosa
             if (document.body.contains(elementoPDF)) {
                 document.body.removeChild(elementoPDF);
             }
             Swal.fire({
                 icon: 'success',
                 title: '¡Descarga Exitosa!',
-                text: 'Tu PDF se ha guardado en el dispositivo.',
-                timer: 2000,
+                text: 'Tu PDF se ha guardado correctamente.',
+                timer: 1800,
                 showConfirmButton: false
             });
         }).catch(error => {
-            console.error("Error al exportar PDF:", error);
+            console.error("Error PDF:", error);
             if (document.body.contains(elementoPDF)) {
                 document.body.removeChild(elementoPDF);
             }
             Swal.fire({
                 icon: 'error',
-                title: 'Error de Renderizado',
-                text: 'No se pudo compilar el documento en este navegador.'
+                title: 'Error',
+                text: 'No se pudo procesar el archivo en este dispositivo.'
             });
         });
-    }, 300);
+    }, 350);
 }
