@@ -270,6 +270,7 @@
     const SUPABASE_URL = "https://ttncfefgemtpiultyaza.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_nSf8vOvB79Tdb60YwvEVoQ_S3iDQOcQ";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const APP_IDENTIFIER = 'balloons';
 
     let inventarioGlobal = [];
     let cotizacionActual = [];
@@ -598,7 +599,7 @@
 
     async function descargarInventarioSupabase() {
         if(!usuarioSesion || !usuarioSesion.esPremium || usuarioSesion.diasRestantes <= 0) return;
-        const { data, error } = await _supabase.from('inventario').select('*').eq('user_id', usuarioSesion.id);
+        const { data, error } = await _supabase.from('inventario').select('*').eq('user_id', usuarioSesion.id).eq('app_id', APP_IDENTIFIER);
         if(!error && data) {
             inventarioGlobal = data.map(item => ({
                 id: item.id,
@@ -800,7 +801,8 @@
             subtipo: subtipo,
             unidades_paquete: calc.cantidadOriginal,
             costo_paquete: calc.totalCost,
-            costo_unitario: calc.cost
+            costo_unitario: calc.cost,
+            app_id: APP_IDENTIFIER
         };
 
         if(usuarioSesion && usuarioSesion.esPremium && usuarioSesion.diasRestantes > 0) {
@@ -1062,6 +1064,7 @@
                         materiales: cotizacionActual,
                         configuracion: configMesa,
                         user_id: usuarioSesion.id,
+                        app_id: APP_IDENTIFIER,
                         total_sugerido: parseFloat(document.getElementById('res-precio-final').innerText.replace(/[^0-9.-]+/g,"")) || 0
                     }]);
                 } else {
@@ -1080,7 +1083,7 @@
         let plantillas = [];
 
         if(usuarioSesion && usuarioSesion.esPremium && usuarioSesion.diasRestantes > 0) {
-            const { data } = await _supabase.from('plantillas').select('*').eq('user_id', usuarioSesion.id);
+            const { data } = await _supabase.from('plantillas').select('*').eq('user_id', usuarioSesion.id).eq('app_id', APP_IDENTIFIER);
             if(data) plantillas = data;
         } else {
             plantillas = JSON.parse(localStorage.getItem('studio_os_plantillas')) || [];
