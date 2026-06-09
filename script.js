@@ -268,7 +268,7 @@
    ========================================================================= */
 
     const SUPABASE_URL = "https://ttncfefgemtpiultyaza.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_nSf8vOvB79Tdb60YwvEVoQ_S3iDQOcQ";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0bmNmZWZnZW10cGl1bHR5YXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODY3NDgsImV4cCI6MjA5NjM2Mjc0OH0.zo-obF_anF54BUY73_ZLIiHmAPJ-je9HpJXAKJ77LCQ";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const APP_IDENTIFIER = 'balloons';
 
